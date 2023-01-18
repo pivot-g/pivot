@@ -1,0 +1,21 @@
+- aws_profile:
+    name: testing
+    region: us-east-1
+    assume_role: ""
+
+- aws_profile:
+    name: testing1
+    region: us-east-1
+    assume_role: ""
+
+- password_policy:
+    name: hellowd
+
+- renew:
+    name: reniew password in aws secret
+    schedule: "0283r"
+    password_policy: "hellow"
+    aws_secret:
+      name: secret1
+      aws_profile: testing
+      region: "few"
