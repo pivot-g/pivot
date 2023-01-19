@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/go-playground/validator/v10"
 )
 
@@ -13,10 +11,9 @@ func PasswordPolicy(m map[string]interface{}) map[string]interface{} {
 	return map[string]interface{}{"h": "Hellow World..."}
 }
 
-func Validation(c map[string]interface{}) bool {
+func Validation(c map[string]interface{}) map[string]interface{} {
 	validate := validator.New()
 	errs := validate.ValidateMap(c, Parms)
-	fmt.Println(errs)
 
-	return true
+	return errs
 }

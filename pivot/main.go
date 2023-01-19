@@ -5,8 +5,7 @@ import (
 
 	"github.com/pivot-g/pivot/pivot/config"
 	"github.com/pivot-g/pivot/pivot/plugin"
-	"github.com/pivot-g/pivot/pivot/utility"
-	"golang.org/x/exp/maps"
+	"github.com/pivot-g/pivot/pivot/validation"
 )
 
 func main() {
@@ -28,54 +27,45 @@ func main() {
 		ConfigMap: make(map[string]map[string]map[string]interface{}),
 	}
 	conf.LoadConfig()
-	fmt.Println(conf)
-
-	for _, c := range conf.ReadConfig() {
-		for k, v := range c {
-			fmt.Println("k, v")
-			fmt.Println(k, v)
-
-			d := utility.ConvMapInterface(v.(map[interface{}]interface{}))
-			Plugins.PluginMap[k].Validation(d)
-
-			refType, incType := GetPlugingMentioned(Plugins.PluginMap[k].Dependency, d)
-			fmt.Println("refType", refType, "incType", incType)
-			for _, depend := range incType {
-				x := utility.ConvMapInterface(d[depend].(map[interface{}]interface{}))
-				Plugins.PluginMap[depend].Validation(x)
-			}
-			for _, depend := range refType {
-				if d[depend] == maps.Keys(conf.ConfigMap[depend])[0] {
-					fmt.Println(depend, "present")
-
-				} else {
-					fmt.Println(depend, "not present")
-				}
-
-			}
-		}
-
-	}
+	fmt.Println(Plugins.PluginMap)
+	validation.ConfigVal(conf, Plugins)
 
 }
 
-func GetPlugingMentioned(dependency []string, configBlock map[string]interface{}) ([]string, []string) {
-	refType := []string{}
-	incType := []string{}
-	for k, _ := range configBlock {
-		fmt.Println("k")
-		fmt.Println(k)
-		if utility.In(dependency, "ref:"+k) {
-			refType = append(refType, k)
-		}
-		if utility.In(dependency, "inc:"+k) {
-			incType = append(incType, k)
-		}
-	}
-	return refType, incType
-}
+// func ConfigVal(conf *config.Config, Plugins *plugin.Plugin) {
+// 	for _, c := range conf.ReadConfig() {
+// 		BlockVal(c, conf, Plugins)
 
-// func Val(str, p map[string]plugin.PluginMap) {
-// 	p[k].Validation(d)
+// 	}
+// }
+
+// func BlockVal(block map[string]interface{}, conf *config.Config, Plugins *plugin.Plugin) {
+// 	for k, v := range block {
+// 		fmt.Println("k, v")
+// 		fmt.Println(k, v)
+
+// 		d := utility.ConvMapInterface(v.(map[interface{}]interface{}))
+// 		Plugins.PluginMap[k].Validation(d)
+
+// 		refType, incType := config.GetPlugingMentioned(Plugins.PluginMap[k].Dependency, d)
+// 		fmt.Println("refType", refType, "incType", incType)
+
+// 		for _, depend := range incType {
+// 			//subBlock := utility.ConvMapInterface(d[depend].(map[interface{}]interface{}))
+// 			subBlock := map[string]interface{}{depend: d[depend]}
+// 			fmt.Println("subBlock", subBlock)
+// 			//Plugins.PluginMap[depend].Validation(subBlock)
+// 			BlockVal(subBlock, conf, Plugins)
+// 		}
+// 		for _, depend := range refType {
+// 			if d[depend] == maps.Keys(conf.ConfigMap[depend])[0] {
+// 				fmt.Println(depend, "present")
+
+// 			} else {
+// 				fmt.Println(depend, "not present")
+// 			}
+
+// 		}
+// 	}
 
 // }

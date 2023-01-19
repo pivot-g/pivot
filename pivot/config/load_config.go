@@ -10,6 +10,7 @@ import (
 	"github.com/pivot-g/pivot/pivot/plugin"
 	"github.com/pivot-g/pivot/pivot/utility"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v2"
 )
 
@@ -119,4 +120,23 @@ func Validate(p map[string]interface{}, c map[string]interface{}) {
 		// The user is invalid
 	}
 
+}
+
+func GetPlugingMentioned(dependency []string, configBlock map[string]interface{}) ([]string, []string) {
+	refType := []string{}
+	incType := []string{}
+	fmt.Println("dependency", dependency)
+	fmt.Println("configBlock", configBlock)
+	for k, _ := range configBlock {
+		// fmt.Println("k")
+		// fmt.Println(k)
+
+		if slices.Contains(dependency, "ref:"+k) {
+			refType = append(refType, k)
+		}
+		if slices.Contains(dependency, "inc:"+k) {
+			incType = append(incType, k)
+		}
+	}
+	return refType, incType
 }

@@ -14,13 +14,13 @@ type PluginConfig struct {
 	Plugin     string   `yaml:"Plugin,omitempty" json:"Plugin,omitempty" validate:"required"`
 	Main       string   `yaml:"Main,omitempty" json:"Main,omitempty" validate:"required"`
 	Type       string   `yaml:"Type,omitempty" json:"Type,omitempty" validate:"required"`
-	Version    string   `yaml:"Version,omitempty" json:"Version,omitempty" validate:"required"`
+	Version    string   `yaml:"Version,omitempty" json:"Version,omitempty" validate:"required,semver"`
 	Dependency []string `yaml:"Dependency,omitempty" json:"Dependency,omitempty"`
 }
 
 type PluginMap struct {
-	Func       func(map[string]interface{}) map[string]interface{}
-	Validation func(map[string]interface{}) bool
+	Func       func(map[string]interface{}, map[string]PluginMap) map[string]interface{}
+	Validation func(map[string]interface{}) map[string]interface{}
 	Dependency []string
 	Name       string
 	Type       string
@@ -33,7 +33,10 @@ type Plugin struct {
 }
 
 func (p Plugin) LoadPlugins() {
-	for _, plug := range p.ReadPlugin() {
+	o := p.ReadPlugin()
+	fmt.Println("p.ReadPlugin()")
+	fmt.Println(o)
+	for _, plug := range o {
 		dir := p.PluginDir + "/" + plug.Name + ".so"
 		lplug, _ := plugin.Open(dir)
 
@@ -49,14 +52,14 @@ func (p Plugin) LoadPlugins() {
 }
 
 func (p Plugin) ReadPlugin() []PluginConfig {
-	config := PluginConfig{}
 	configOut := []PluginConfig{}
 	valid := validator.New()
 	for file, content := range *utility.ReadYamlandJsonFile(&p.PluginDir) {
-		json.Unmarshal(content, &config)
-		err := valid.Struct(config)
+		localConf := PluginConfig{}
+		json.Unmarshal(content, &localConf)
+		err := valid.Struct(localConf)
 		if err == nil {
-			configOut = append(configOut, config)
+			configOut = append(configOut, localConf)
 		} else {
 			for _, err := range err.(validator.ValidationErrors) {
 				fmt.Println(err.Field(), "is", err.Tag(), "on plugin", file)
@@ -78,9 +81,9 @@ func GetFunc(n string, p *plugin.Plugin) func(map[string]interface{}) map[string
 	return from_parent
 }
 
-func GetValidationFunc(n string, p *plugin.Plugin) func(map[string]interface{}) bool {
+func GetValidationFunc(n string, p *plugin.Plugin) func(map[string]interface{}) map[string]interface{} {
 	Func, _ := p.Lookup(n)
-	from_parent := Func.(func(map[string]interface{}) bool)
+	from_parent := Func.(func(map[string]interface{}) map[string]interface{})
 	return from_parent
 }
 
@@ -88,19 +91,3 @@ func (p Plugin) GetPluginType(name string) string {
 	return p.PluginMap[name].Type
 
 }
-
-// func (p Plugin) Validate(c []PluginConfig) {
-// 	valid := validator.New()
-// 	for _, data := range c {
-// 		err := valid.Struct(data)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			for _, err := range err.(validator.ValidationErrors) {
-// 				fmt.Println(err.Field(), "is", err.Tag(), "on plugin")
-// 			}
-
-// 		}
-
-// 	}
-
-// }
