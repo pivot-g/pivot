@@ -12,7 +12,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func ConfigVal(conf *config.Config, Plugins *plugin.Plugin) {
+func ConfigVal(conf *config.Config, Plugins *plugin.Plugins) {
 	for name, plug := range Plugins.PluginMap {
 		valid := validator.New()
 		err := valid.Struct(plug)
@@ -31,7 +31,7 @@ func ConfigVal(conf *config.Config, Plugins *plugin.Plugin) {
 
 }
 
-func BlockVal(block map[string]interface{}, conf *config.Config, Plugins *plugin.Plugin) {
+func BlockVal(block map[string]interface{}, conf *config.Config, Plugins *plugin.Plugins) {
 	for k, v := range block {
 		fmt.Println("k, v")
 		fmt.Println(k, v)

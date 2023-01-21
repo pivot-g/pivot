@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/go-playground/validator/v10"
-	"github.com/pivot-g/pivot/pivot/plugin"
 )
 
 var Parms = map[string]interface{}{"name": "required", "schedule": "required", "password_policy": "required"}
 
-func Renew(m map[string]interface{}, p map[string]plugin.PluginMap) map[string]interface{} {
-	p["jhh"].Func.(func(map[string]interface{}, map[string]plugin.PluginMap) map[string]interface{})(m, p)
+func Renew(p map[string]interface{}) map[string]interface{} {
+	fmt.Println("p.Dependency")
 
 	return map[string]interface{}{"h": "Hellow World..."}
 }

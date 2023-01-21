@@ -9,12 +9,13 @@ import (
 )
 
 func main() {
-	Plugins := &plugin.Plugin{
+	Plugins := &plugin.Plugins{
 		PluginDir: "/Users/natsaiso/go/src/pivot-g/pivot/plugins/auth/",
 		PluginMap: make(map[string]plugin.PluginMap),
 	}
 
 	Plugins.LoadPlugins()
+	Plugins.LoadDependencyMap()
 	// fmt.Println(Plugins.PluginMap)
 	conf := &config.Config{
 		Dir:       "/Users/natsaiso/go/src/pivot-g/pivot/example/config",
@@ -27,8 +28,16 @@ func main() {
 		ConfigMap: make(map[string]map[string]map[string]interface{}),
 	}
 	conf.LoadConfig()
+
 	fmt.Println(Plugins.PluginMap)
 	validation.ConfigVal(conf, Plugins)
+
+	// d := map[string]func(plugin.Plugin) map[string]interface{}{
+	// 	"renew": Plugins.PluginMap["renew"].Dependency
+	// }
+	// Plugins.PluginMap["renew"].Func(plugin.Plugin{
+	// 	Dependency: Plugins.PluginMap["renew"].Dependency,
+	// })
 
 }
 

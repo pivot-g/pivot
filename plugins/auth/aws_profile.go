@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/go-playground/validator/v10"
 )
 
 var Parms = map[string]interface{}{"name": "required", "region": "required", "assume_role": ""}
 
-func AwsProfile(m map[string]interface{}) map[string]interface{} {
+func AwsProfile(p map[string]interface{}) map[string]interface{} {
+	fmt.Println("")
 
 	return map[string]interface{}{"h": "Hellow World..."}
 }
