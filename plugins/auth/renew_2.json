@@ -1,0 +1,17 @@
+{
+    "Name": "renew",
+    "Plugin": "renew.so",
+    "Main": "Renew",
+    "Type": "scheduler",
+    "Version": "0.0.2",
+    "Dependency": {
+        "aws_secret": {
+            "version": "0.0.1",
+            "type": "inc"
+        },
+        "password_policy": {
+            "version": "0.0.1",
+            "type": "ref"
+        }
+    }
+}

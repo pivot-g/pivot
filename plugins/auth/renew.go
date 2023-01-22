@@ -8,7 +8,7 @@ import (
 
 var Parms = map[string]interface{}{"name": "required", "schedule": "required", "password_policy": "required"}
 
-func Renew(p map[string]interface{}) map[string]interface{} {
+func Renew(m map[string]interface{}) map[string]interface{} {
 	fmt.Println("p.Dependency")
 
 	return map[string]interface{}{"h": "Hellow World..."}

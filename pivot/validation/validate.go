@@ -13,45 +13,57 @@ import (
 )
 
 func ConfigVal(conf *config.Config, Plugins *plugin.Plugins) {
-	for name, plug := range Plugins.PluginMap {
-		valid := validator.New()
-		err := valid.Struct(plug)
-		if err != nil {
-			for _, err := range err.(validator.ValidationErrors) {
-				fmt.Println(err.Field(), "is", err.Tag(), "on plugin", name)
-				os.Exit(2)
+	valid := validator.New()
+	for name, plugs := range Plugins.PluginMap {
+		for version, plug := range plugs {
+			err := valid.Struct(plug)
+			if err != nil {
+				for _, err := range err.(validator.ValidationErrors) {
+					fmt.Println(err.Field(), "is", err.Tag(), "on plugin", name, "version", version)
+					os.Exit(2)
+				}
 			}
 		}
 
 	}
 	for _, c := range conf.ReadConfig() {
-		BlockVal(c, conf, Plugins)
+		BlockVal(c, conf, Plugins, "")
 
 	}
 
 }
 
-func BlockVal(block map[string]interface{}, conf *config.Config, Plugins *plugin.Plugins) {
+func BlockVal(block map[string]interface{}, conf *config.Config, Plugins *plugin.Plugins, parentPlug string) {
 	for k, v := range block {
-		fmt.Println("k, v")
-		fmt.Println(k, v)
-
+		// fmt.Println("k, v")
+		// fmt.Println("parentPlug")
+		// fmt.Println(parentPlug)
+		// fmt.Println(k, v)
 		d := utility.ConvMapInterface(v.(map[interface{}]interface{}))
-		errs := Plugins.PluginMap[k].Validation(d)
+		version := ""
+		if parentPlug == "" {
+			version = Plugins.GetLatestPlugin(k)
+
+		} else {
+			version = Plugins.GetLatestPlugin(parentPlug)
+			version = Plugins.PluginMap[parentPlug][version].Dependency[k].Version
+		}
+
+		// fmt.Println("version")
+		// fmt.Println(version)
+		errs := Plugins.PluginMap[k][version].Validation(d)
 		if len(errs) > 0 {
 			fmt.Println(errs)
 			os.Exit(2)
 		}
 
-		refType, incType := config.GetPlugingMentioned(Plugins.PluginMap[k].Dependency, d)
+		refType, incType := config.GetPlugingMentioned(Plugins.PluginMap[k][version].Dependency, d)
 		fmt.Println("refType", refType, "incType", incType)
 
 		for _, depend := range incType {
-			//subBlock := utility.ConvMapInterface(d[depend].(map[interface{}]interface{}))
 			subBlock := map[string]interface{}{depend: d[depend]}
 			fmt.Println("subBlock", subBlock)
-			//Plugins.PluginMap[depend].Validation(subBlock)
-			BlockVal(subBlock, conf, Plugins)
+			BlockVal(subBlock, conf, Plugins, k)
 		}
 		for _, depend := range refType {
 			fmt.Println("d[depend]", d[depend])

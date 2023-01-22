@@ -3,9 +3,15 @@
     "Plugin": "renew.so",
     "Main": "Renew",
     "Type": "scheduler",
-    "Version": "0.6.8",
-    "Dependency": [
-        "inc:aws_secret",
-        "ref:password_policy"
-    ]
+    "Version": "0.0.1",
+    "Dependency": {
+        "aws_secret": {
+            "version": "0.0.1",
+            "type": "inc"
+        },
+        "password_policy": {
+            "version": "0.0.1",
+            "type": "ref"
+        }
+    }
 }

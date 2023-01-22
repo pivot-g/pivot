@@ -18,14 +18,14 @@ type ConfigMap struct {
 	Config map[string]map[string]map[string]interface{}
 }
 type Config struct {
-	Dir       string
-	Api       map[string]map[string]map[string]interface{}
-	Auth      map[string]map[string]map[string]interface{}
-	Scheduler map[string]map[string]map[string]interface{}
-	Resources map[string]map[string]map[string]interface{}
-	Policy    map[string]map[string]map[string]interface{}
+	Dir string
+	// Api       map[string]map[string]map[string]interface{}
+	// Auth      map[string]map[string]map[string]interface{}
+	// Scheduler map[string]map[string]map[string]interface{}
+	// Resources map[string]map[string]map[string]interface{}
+	// Policy    map[string]map[string]map[string]interface{}
 	ConfigMap map[string]map[string]map[string]interface{}
-	PluginMap map[string]plugin.PluginMap
+	PluginMap map[string]map[string]plugin.PluginMap
 }
 
 func (c *Config) ReadConfig() []map[string]interface{} {
@@ -71,41 +71,41 @@ func (c *Config) LoadConfig() {
 			// fmt.Println("name")
 			// fmt.Println(name)
 
-			switch Type := c.PluginMap[k].Type; Type {
-			case "auth":
-				if c.Auth[k] == nil {
-					c.Auth[k] = bb
-				} else {
-					maps.Copy(c.Auth[k], bb)
-				}
+			// switch Type := c.PluginMap[k][].Type; Type {
+			// case "auth":
+			// 	if c.Auth[k] == nil {
+			// 		c.Auth[k] = bb
+			// 	} else {
+			// 		maps.Copy(c.Auth[k], bb)
+			// 	}
 
-			case "scheduler":
-				if c.Scheduler[k] == nil {
-					c.Scheduler[k] = bb
-				} else {
-					maps.Copy(c.Scheduler[k], bb)
-				}
-			case "api":
-				if c.Api[k] == nil {
-					c.Api[k] = bb
-				} else {
-					maps.Copy(c.Api[k], bb)
-				}
-			case "resources":
-				if c.Resources[k] == nil {
-					c.Resources[k] = bb
-				} else {
-					maps.Copy(c.Resources[k], bb)
-				}
-			case "policy":
-				if c.Policy[k] == nil {
-					c.Policy[k] = bb
-				} else {
-					maps.Copy(c.Policy[k], bb)
-				}
-			default:
-				fmt.Printf("unknown plugin refered in config")
-			}
+			// case "scheduler":
+			// 	if c.Scheduler[k] == nil {
+			// 		c.Scheduler[k] = bb
+			// 	} else {
+			// 		maps.Copy(c.Scheduler[k], bb)
+			// 	}
+			// case "api":
+			// 	if c.Api[k] == nil {
+			// 		c.Api[k] = bb
+			// 	} else {
+			// 		maps.Copy(c.Api[k], bb)
+			// 	}
+			// case "resources":
+			// 	if c.Resources[k] == nil {
+			// 		c.Resources[k] = bb
+			// 	} else {
+			// 		maps.Copy(c.Resources[k], bb)
+			// 	}
+			// case "policy":
+			// 	if c.Policy[k] == nil {
+			// 		c.Policy[k] = bb
+			// 	} else {
+			// 		maps.Copy(c.Policy[k], bb)
+			// 	}
+			// default:
+			// 	fmt.Printf("unknown plugin refered in config")
+			// }
 
 		}
 	}
@@ -122,21 +122,27 @@ func Validate(p map[string]interface{}, c map[string]interface{}) {
 
 }
 
-func GetPlugingMentioned(dependency []string, configBlock map[string]interface{}) ([]string, []string) {
+func GetPlugingMentioned(dependency map[string]plugin.Dependency, configBlock map[string]interface{}) ([]string, []string) {
 	refType := []string{}
 	incType := []string{}
 	fmt.Println("dependency", dependency)
 	fmt.Println("configBlock", configBlock)
+	depList := maps.Keys(dependency)
 	for k, _ := range configBlock {
 		// fmt.Println("k")
 		// fmt.Println(k)
 
-		if slices.Contains(dependency, "ref:"+k) {
-			refType = append(refType, k)
+		if slices.Contains(depList, k) {
+			switch Type := dependency[k].Type; Type {
+			case "ref":
+				refType = append(refType, k)
+
+			case "inc":
+				incType = append(incType, k)
+
+			}
 		}
-		if slices.Contains(dependency, "inc:"+k) {
-			incType = append(incType, k)
-		}
+
 	}
 	return refType, incType
 }

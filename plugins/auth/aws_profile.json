@@ -4,8 +4,5 @@
     "Main": "AwsProfile",
     "Type": "auth",
     "Version": "0.0.1",
-    "Dependency": [
-        "",
-        ""
-    ]
+    "Dependency": {}
 }

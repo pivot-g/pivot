@@ -8,8 +8,8 @@ import (
 
 var Parms = map[string]interface{}{"name": "required", "min": "required"}
 
-func PasswordPolicy(p map[string]interface{}) map[string]interface{} {
-	fmt.Println("")
+func PasswordPolicy(m map[string]interface{}) map[string]interface{} {
+	fmt.Println("password_policy")
 
 	return map[string]interface{}{"h": "Hellow World..."}
 }

@@ -8,7 +8,11 @@ import (
 
 var Parms = map[string]interface{}{"name": "required", "region": "required", "assume_role": ""}
 
-func AwsProfile(p map[string]interface{}) map[string]interface{} {
+var Doc string = `
+this is example
+`
+
+func AwsProfile(m map[string]interface{}) map[string]interface{} {
 	fmt.Println("")
 
 	return map[string]interface{}{"h": "Hellow World..."}
