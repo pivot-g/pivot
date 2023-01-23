@@ -26,24 +26,21 @@ type Dependency struct {
 }
 
 type PluginMap struct {
-	Func          func(map[string]interface{}) map[string]interface{}
+	Func          func(interface{}) interface{}
 	Validation    func(map[string]interface{}) map[string]interface{}
 	Dependency    map[string]Dependency
 	Name          string
 	Type          string
 	Version       string
-	DependencyMap map[string]func(map[string]interface{}) map[string]interface{}
+	DependencyMap map[string]func(interface{}) interface{}
 }
 
 type DependencyMap map[string]func(map[string]interface{}) map[string]interface{}
 
 type Plugin struct {
-	Dependency map[string]func(map[string]interface{}) map[string]interface{}
-	Input      map[string]interface{}
+	Dependency map[string]func(interface{}) interface{}
+	Config     map[string]interface{}
 }
-
-// var Dependency map[string]func(map[string]interface{}) map[string]interface{}
-// var Input map[string]interface{}
 
 type Plugins struct {
 	PluginDir string
@@ -70,7 +67,7 @@ func (p *Plugins) LoadPlugins() {
 			Type:          plug.Type,
 			Version:       plug.Version,
 			Dependency:    plug.Dependency,
-			DependencyMap: map[string]func(map[string]interface{}) map[string]interface{}{},
+			DependencyMap: map[string]func(interface{}) interface{}{},
 		}
 		fmt.Println(p.PluginMap)
 	}
@@ -133,10 +130,10 @@ func GetPARAM(p *gplugin.Plugin) *map[string]interface{} {
 	return s.(*map[string]interface{})
 }
 
-func GetFunc(n string, p *gplugin.Plugin) func(map[string]interface{}) map[string]interface{} {
+func GetFunc(n string, p *gplugin.Plugin) func(interface{}) interface{} {
 	Func, err := p.Lookup(n)
 	fmt.Println(err)
-	from_parent := Func.(func(map[string]interface{}) map[string]interface{})
+	from_parent := Func.(func(interface{}) interface{})
 	return from_parent
 }
 

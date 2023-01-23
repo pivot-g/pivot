@@ -8,8 +8,10 @@ import (
 
 var Parms = map[string]interface{}{"name": "required", "region": "required", "assume_role": ""}
 
-func AwsSecret(m map[string]interface{}) map[string]interface{} {
+func AwsSecret(m interface{}) interface{} {
 	fmt.Println("hellow swcret")
+	fmt.Println(m)
+
 	// fmt.Println(p["d"].(plugin.Plugin).Dependency["password_policy"](map[string]interface{}{"a": "s"}))
 
 	return map[string]interface{}{"h": "Hellow World..."}

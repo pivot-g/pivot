@@ -12,7 +12,10 @@ var Doc string = `
 this is example
 `
 
-func AwsProfile(m map[string]interface{}) map[string]interface{} {
+type ReturnValue struct {
+}
+
+func AwsProfile(m interface{}) interface{} {
 	fmt.Println("")
 
 	return map[string]interface{}{"h": "Hellow World..."}
