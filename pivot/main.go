@@ -31,13 +31,13 @@ func main() {
 	Plugins.LoadDependencyMap()
 	fmt.Println(Plugins.PluginMap)
 	fmt.Println(Plugins.GetLatestPlugin("renew"))
-	Plugins.PluginMap["renew"][Plugins.GetLatestPlugin("renew")].Func(
-		plugin.Plugin{
-			Dependency: Plugins.PluginMap["renew"][Plugins.GetLatestPlugin("renew")].DependencyMap,
-			Config:     conf.ConfigMap["renew"]["reniew password in aws secret"],
-		},
-	)
+	// Plugins.PluginMap["renew"][Plugins.GetLatestPlugin("renew")].Func(
+	// 	plugin.Plugin{
+	// 		Dependency: Plugins.PluginMap["renew"][Plugins.GetLatestPlugin("renew")].DependencyMap,
+	// 		Config:     conf.ConfigMap["renew"]["reniew password in aws secret"],
+	// 	},
+	// )
 
-	fmt.Println(conf.ConfigMap["renew"]["reniew password in aws secret"])
+	// fmt.Println(conf.ConfigMap["renew"]["reniew password in aws secret"])
 
 }

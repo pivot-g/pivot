@@ -32,10 +32,13 @@ type PluginMap struct {
 	Name          string
 	Type          string
 	Version       string
-	DependencyMap map[string]func(interface{}) interface{}
+	DependencyMap map[string]DependencyMap
 }
 
-type DependencyMap map[string]func(map[string]interface{}) map[string]interface{}
+type DependencyMap struct {
+	Func          func(interface{}) interface{}
+	DependencyMap map[string]DependencyMap
+}
 
 type Plugin struct {
 	Dependency map[string]func(interface{}) interface{}
@@ -67,7 +70,7 @@ func (p *Plugins) LoadPlugins() {
 			Type:          plug.Type,
 			Version:       plug.Version,
 			Dependency:    plug.Dependency,
-			DependencyMap: map[string]func(interface{}) interface{}{},
+			DependencyMap: map[string]DependencyMap{},
 		}
 		fmt.Println(p.PluginMap)
 	}
@@ -102,18 +105,23 @@ func (p *Plugins) ReadPlugin() []PluginConfig {
 func (p *Plugins) LoadDependencyMap() {
 	for name, plugs := range p.PluginMap {
 		for versions, plug := range plugs {
-
-			for depend, value := range plug.Dependency {
-				p.PluginMap[name][versions].DependencyMap[depend] = p.PluginMap[depend][value.Version].Func
-				// if thisProduct, ok := p.PluginMap[name][versions].DependencyMap[depend]; ok {
-				// 	thisProduct = p.PluginMap[depend][value.Version].Func
-				// 	p.PluginMap[name][versions].DependencyMap[depend] = thisProduct
-				// }
-			}
+			p.MakeDependencyMap(plug.Dependency, name, versions)
 		}
 
 	}
 
+}
+
+func (p *Plugins) MakeDependencyMap(dep map[string]Dependency, name string, versions string) {
+	for depend, value := range dep {
+		p.PluginMap[name][versions].DependencyMap[depend] = DependencyMap{
+			Func: p.PluginMap[depend][value.Version].Func,
+		}
+		if len(p.PluginMap[depend][value.Version].Dependency) != 0 {
+			p.MakeDependencyMap(p.PluginMap[depend][value.Version].Dependency, depend, value.Version)
+		}
+
+	}
 }
 
 // func (p *Plugins) GetDependencyMap(plugName string) map[string]func(map[string]interface{}) map[string]interface{} {
