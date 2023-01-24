@@ -104,8 +104,17 @@ func (p *Plugins) ReadPlugin() []PluginConfig {
 
 func (p *Plugins) LoadDependencyMap() {
 	for name, plugs := range p.PluginMap {
-		for versions, plug := range plugs {
-			p.MakeDependencyMap(plug.Dependency, name, versions)
+		for versions, _ := range plugs {
+			bb := p.GetDependency(name, versions)
+			if len(bb) == 0 {
+				continue
+			}
+			fmt.Println(bb)
+			pp := maps.Keys(bb)[0]
+			p.PluginMap[name][versions].DependencyMap[pp] = DependencyMap{
+				Func:          bb[pp].Func,
+				DependencyMap: bb[pp].DependencyMap,
+			}
 		}
 
 	}
@@ -124,14 +133,17 @@ func (p *Plugins) MakeDependencyMap(dep map[string]Dependency, name string, vers
 	}
 }
 
-// func (p *Plugins) GetDependencyMap(plugName string) map[string]func(map[string]interface{}) map[string]interface{} {
-// 	out := map[string]func(map[string]interface{}) map[string]interface{}{}
-// 	for name, depend := range p.PluginMap[plugName].Dependency {
-// 		out[name] = p.PluginMap[name+"@"+depend.Version].Func
-// 	}
-// 	return out
+func (p *Plugins) GetDependency(plugName string, version string) map[string]DependencyMap {
+	out := make(map[string]DependencyMap)
+	for name, depend := range p.PluginMap[plugName][version].Dependency {
+		out[name] = DependencyMap{
+			Func:          p.PluginMap[name][depend.Version].Func,
+			DependencyMap: p.GetDependency(name, depend.Version),
+		}
+	}
+	return out
 
-// }
+}
 
 func GetPARAM(p *gplugin.Plugin) *map[string]interface{} {
 	s, _ := p.Lookup("Parms")
@@ -150,8 +162,3 @@ func GetValidationFunc(n string, p *gplugin.Plugin) func(map[string]interface{})
 	from_parent := Func.(func(map[string]interface{}) map[string]interface{})
 	return from_parent
 }
-
-// func (p Plugins) GetPluginType(name string) string {
-// 	return p.PluginMap[name].Type
-
-// }
