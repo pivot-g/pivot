@@ -1,0 +1,8 @@
+{
+    "Name": "aws_profile",
+    "Plugin": "aws_profile.so",
+    "Main": "AwsProfile",
+    "Type": "auth",
+    "Version": "0.0.1",
+    "Dependency": {}
+}
